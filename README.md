@@ -1,4 +1,4 @@
-### RECOPILACIÓN BÁSICA: 12 COMANDOS ÚTILES DE GIT
+### RECOPILACIÓN BÁSICA: 15 COMANDOS ÚTILES DE GIT
 
 ---
 
@@ -6,7 +6,7 @@ Recopilación de comandos esenciales para usar Git, acompañados de concisas des
 
 ---
 
-> {a} = Nombre autor | {c} = Commit-hash | {f} = Fichero | {m} = Mensaje | {r} = Rama
+> {a} = Nombre autor | {c} = Commit-hash | {f} = Fichero | {m} = Mensaje | {r} = Rama |
 > {o} = Repositorio remoto | {on} = Nombre nuevo remoto
 
 *Comandos para antes de empezar a usar Git, sirven para identificar al autor de los commits:*
@@ -111,40 +111,72 @@ git log
 - **`git log --graph` →** Muestra un gráfico ASCII que representa las ramas y fusiones.
 - **`git log --author={a}` →** Muestra únicamente los commits del autor especificado.
 
-8. Actualiza el repositorio local con los cambios del repositorio remoto.
+8. Descarga cambios del repositorio remoto a tu repositorio local sin fusionarlos automáticamente.
+
+```sh
+git fetch
+```
+> *Entre las variantes de* **fetch** *tenemos las siguientes:*
+
+- **`git fetch --prune` →** Realiza una limpieza de referencias locales que no están en el repositorio remoto.
+- **`git fetch {o}` →** Descarga cambios del repositorio remoto especificado en caso de tener más configurados.
+
+9. Fusiona los cambios de una rama en otra, creando un nuevo commit de fusión si es necesario.
+
+```sh
+git merge {r}
+```
+> *Entre las variantes de* **merge** *tenemos las siguientes:*
+
+**`git merge --no-ff {r}` →** Realiza una fusión convencional, pero creará un nuevo commit de fusión.
+**`git merge --squash {r}` →** Realiza una fusión y junta todos los commits de la rama en uno solo.
+
+10. Actualiza el repositorio local con los cambios del repositorio remoto.
 
 ```sh
 git pull
 ```
-> *Estos comandos son los mismo que* **git pull**, *pero de una forma más controlada*
+> *Entre las variantes de* **pull** *tenemos las siguientes:*
  
-- **`git fetch` →** Descarga los cambios desde el repositorio remoto, pero no los aplica en local.
-- **`git merge {b}` →** Fusiona los cambios descargados de la rama remota a la rama local actual.
+- **`git pull {o} {r}` →** Descarga y fusiona el contenido de la rama remota en local.
+- **`git pull --rebase {o} {r}` →** Descarga y fusiona reorganizando los commits; se pueden resolver conflictos durante la fusión si es necesario.
+- **`git pull --ff-only {o} {r}` →** Descarga, fusiona y reorganiza, pero fallará si existe conflicto.
 
 9. Agrega el fichero especificado al área de preparación.
 
 ```sh
-9. git add {f}
+11. git add {f}
 ```
 > *Entre las variantes de* **add** *tenemos las siguientes:*
  
 - **`git add -A` →** Agrega todos los cambios, incluyendo archivos nuevos.
 - **`git add -u` →** Agrega todos los cambios, pero omite los no rastreados.
 
-*El comando* **add** *prepara los cambios realizados para la confirmación* **commit**
+*El comando* **add** *envía los archivos al área de preparación (staging area)*
 
-10. Remueve el fichero especificado del área de preparación.
+13. Deshace los cambios del archivo que aún no están en el área de preparación.
+
+```sh
+git restore {f}
+```
+> *Entre las variantes de* **reset** *tenemos las siguientes:*
+
+- **`git restore --staged {f}` →** Deshace los cambios del archivo del área de preparación.
+- **`git restore --source={c} {f}` →** Restaura el archivo al estado de un commit especifico.
+- **`git restore --worktree {f}` →** Deshace los cambios del archivo y restaura el último commit.
+
+13. Deshace los cambios del archivo que ya están en el área de preparación.
 
 ```sh
 git reset {f}
 ```
 > *Entre las variantes de* **reset** *tenemos las siguientes:*
 
-- **`git reset --soft {c}`** → Cambia al commit, converva los cambios y mantiene la confirmación.
-- **`git reset --mixed {c}`** → Cambia al commit, converva los cambio y quita la confirmación.
-- **`git reset --hard {c}`** → Cambia al commit quitando todos los cambios. **CUIDADO**
+- **`git reset --soft {c}` →** Cambia al commit, converva los cambios y mantiene la confirmación.
+- **`git reset --mixed {c}` →** Cambia al commit, converva los cambio y quita la confirmación.
+- **`git reset --hard {c}` →** Cambia al commit quitando todos los cambios. **CUIDADO**
 
-11. Realiza la confirmación de los cambios en el repositorio local con un mensaje breve.
+14. Realiza la confirmación de los archivos del área de preparación con un mensaje breve.
 
 ```sh
 git commit -m “{m}”
@@ -155,13 +187,13 @@ git commit -m “{m}”
 - **`git commit -am “{m}”` →** Confirma los cambios con un mensaje, omitiendo los no rastreados.
 - **`git commit --amend` →** Permite modificar el mensaje de la confirmación más reciente.
 
-12. Se utiliza para enviar los cambios confirmados del repositorio local a un remoto.
+15. Se utiliza para enviar los cambios confirmados del repositorio local a un remoto.
 
 ```sh
 git push
 ```
 > *Entre las variantes de* **push** *tenemos las siguientes:*
 
-- **`git push {o} {r}`**  → Sube el commit de la rama local especificada a la rama remota.
+- **`git push {o} {r}` →** Sube el commit reciente Yde la rama local especificada a la rama remota.
 - **`git push {o} :{r}` →** Elimina la rama remota especificada sin subir el commit.
 - **`git push --all {o}` →** Sube todas las ramas locales al repositorio remoto.
