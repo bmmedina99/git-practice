@@ -1,1 +1,0 @@
-Primer comentario para la practica con Git | archivo1-1.txt

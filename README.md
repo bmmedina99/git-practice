@@ -1,32 +1,36 @@
-### RECOPILACIÓN BÁSICA: 15 COMANDOS ÚTILES DE GIT
+<h1 style="text-align:center;">RECOPILACIÓN BÁSICA: 15 COMANDOS ÚTILES DE GIT</h1>
+
+![RECOPILACIÓN BÁSICA: 15 COMANDOS ÚTILES DE GIT](./img/banner-git.png)
 
 ---
 
-Recopilación de comandos esenciales para usar Git, acompañados de concisas descripciones y variantes que apuntan hacia una camino para la gestión eficaz de los repositorios.
+Recopilación básica de 15 comandos útiles y esenciales para usar Git, acompañados de una breve, pero detallada explicación que te ayudarán en la gestión de tus repositorios.
 
 ---
 
-> {a} = Nombre autor | {c} = Commit-hash | {f} = Fichero | {m} = Mensaje | {r} = Rama |
-> {o} = Repositorio remoto | {on} = Nombre nuevo remoto
+Para empezar, debemos tener instalado **[Git](https://git-scm.com/download/)**. Una vez lo tenemos podrémos ejecutar los siguientes comandos iniciales:
 
-*Comandos para antes de empezar a usar Git, sirven para identificar al autor de los commits:*
-
-**→** Se utiliza para configurar la dirección de correo asociada a los commits. 
-**NOTA:** Recomendable utilizar la misma dirección de correo en Git que en GitHub.
+**→** Se usa para asociar la dirección de correo a los *commits*.
 
 ```sh
 git config --global user.email "micorreo@correo.com"
 ```
 
-**→** Se utiliza para configurar el nombre del autor asociado a los commits.
+**→** Se usa para asociar el nombre del autor a los *commits*.
 
 ```sh
 git config --global user.name "{a}"
 ```
-
-> *El uso del* **--global** *es la configuración global la cual será aplicada de forma predeterminada a todos repositorios locales.*
+> [!NOTE]
+> La flag **--global** afecta globalmente a todos los repositorios locales. Si deseas que la configuración solo afecte al repositorio local actual omite dicha flag.
 
 ---
+
+<h3>LEYENDA</h3>
+
+![LEYENDA USADA PARA LOS COMANDOS](./img/legend-git.png)
+
+<h3>COMANDOS</h3>
 
 1. Crea un nuevo repositorio local en el directorio actual.
 
@@ -128,8 +132,8 @@ git merge {r}
 ```
 > *Entre las variantes de* **merge** *tenemos las siguientes:*
 
-**`git merge --no-ff {r}` →** Realiza una fusión convencional, pero creará un nuevo commit de fusión.
-**`git merge --squash {r}` →** Realiza una fusión y junta todos los commits de la rama en uno solo.
+- **`git merge --no-ff {r}` →** Realiza una fusión convencional, pero creará un nuevo commit de fusión.
+- **`git merge --squash {r}` →** Realiza una fusión y junta todos los commits de la rama en uno solo.
 
 10. Actualiza el repositorio local con los cambios del repositorio remoto.
 
@@ -142,10 +146,10 @@ git pull
 - **`git pull --rebase {o} {r}` →** Descarga y fusiona reorganizando los commits; se pueden resolver conflictos durante la fusión si es necesario.
 - **`git pull --ff-only {o} {r}` →** Descarga, fusiona y reorganiza, pero fallará si existe conflicto.
 
-9. Agrega el fichero especificado al área de preparación.
+11. Agrega el fichero especificado al área de preparación.
 
 ```sh
-11. git add {f}
+git add {f}
 ```
 > *Entre las variantes de* **add** *tenemos las siguientes:*
  
@@ -154,7 +158,7 @@ git pull
 
 *El comando* **add** *envía los archivos al área de preparación (staging area)*
 
-13. Deshace los cambios del archivo que aún no están en el área de preparación.
+12. Deshace los cambios del archivo que aún no están en el área de preparación.
 
 ```sh
 git restore {f}
@@ -197,3 +201,31 @@ git push
 - **`git push {o} {r}` →** Sube el commit reciente Yde la rama local especificada a la rama remota.
 - **`git push {o} :{r}` →** Elimina la rama remota especificada sin subir el commit.
 - **`git push --all {o}` →** Sube todas las ramas locales al repositorio remoto.
+
+---
+
+### RECOPILACIÓN AVANZADA: 10 COMANDOS ÚTILES DE GIT
+
+---
+
+git rebase: Reescribe el historial de commits, lo que puede ayudar a mantener un historial más limpio y lineal en lugar de tener múltiples fusiones.
+
+git cherry: Se utiliza para mostrar los commits que existen en una rama pero no en otra.
+
+git cherry-pick: Permite seleccionar y aplicar un commit específico de una rama a otra, lo que es útil para la incorporación selectiva de cambios.
+
+git stash: Temporalmente guarda cambios locales no comprometidos en una pila para que puedas cambiar de rama o realizar otras operaciones sin necesidad de confirmarlos.
+
+git bisect: Ayuda a encontrar el commit que introdujo un error mediante una búsqueda binaria automatizada, lo que facilita la identificación de problemas.
+
+git submodule: Permite gestionar submódulos en un repositorio, lo que es útil cuando deseas incluir otros repositorios dentro de tu proyecto.
+
+git filter-branch: Útil para reescribir el historial de commits, eliminar archivos sensibles o realizar otras operaciones avanzadas en el historial.
+
+git blame: Muestra quién modificó por última vez cada línea de un archivo, lo que es útil para rastrear la autoría de cambios específicos.
+
+git reflog: Muestra un registro detallado de todas las operaciones realizadas en el repositorio, lo que puede ser útil para recuperar cambios perdidos.
+
+git worktree: Permite trabajar con múltiples copias de trabajo independientes en un solo repositorio, lo que es útil para trabajar en diferentes características o versiones de tu proyecto al mismo tiempo.
+
+git hooks: Son scripts personalizables que puedes ejecutar en eventos específicos de Git, como pre-commit o post-merge, para automatizar tareas personalizadas en tu flujo de trabajo.
