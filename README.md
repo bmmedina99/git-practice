@@ -1,4 +1,4 @@
-![FLUJO DE TRABAJO CON GIT: COMANDOS BÁSICOS](./img/banner-git.png)
+![FLUJO DE TRABAJO CON GIT: COMANDOS BÁSICOS](./assets/banner-git.png)
 
 <h1 style="text-align:center;">FLUJO DE TRABAJO CON GIT: COMANDOS BÁSICOS</h1>
 
