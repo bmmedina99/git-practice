@@ -1,52 +1,72 @@
-![FLUJO DE TRABAJO CON GIT: COMANDOS BÁSICOS](./assets/banner-git.png)
+![Guía práctica de comandos básicos de Git](./assets/banner-git.png)
 
-<h1 style="text-align:center;">FLUJO DE TRABAJO CON GIT: COMANDOS BÁSICOS</h1>
+# ¿Qué es Git?
 
----
+Cuando estamos creando un proyecto queremos mantenerlo seguro a los cambios y aquí es donde entra **Git** un **sistema de control de versiones distribuido**, guardando snapshots de tu código *(commits)* ayudando a comparar y revertir cambios sin perder historial.
 
-<h4>¿Qué es Git y por qué es útil?</h4>
+>[!NOTE]
+> **Snapshot** es el guardado de un estado de tu repositorio local en un momento específico, donde se encontrarían todos los archivos rastreados.
 
-Git es una herramienta de **control de versiones** que nos permite guardar y gestionar cambios en nuestro código. Además de ayudar a recuperar fácilmente versiones anteriores, también facilita el trabajo **colaborativo** con la ayuda de GitHub.
-
-<h4>Objetivo de la guía</h4>
+## Objetivo de esta guía
 
 En esta guía, conocerás y aplicarás los **comandos básicos** y esenciales para gestionar **repositorios** con Git & GitHub, siguiendo buenas prácticas y un flujo de trabajo eficiente.
 
 ---
 
-Antes de empezar a trabajar con Git, es necesario tenerlo instalado en nuestro sistema. Puedes descargarlo desde la **[página oficial de Git](https://git-scm.com/download/)**. Para probar que lo tienes instalado, prueba a ejecutar el siguiendo comando.
+### Instalación y configuración inicial
+
+#### Instalación
+
+Para poder trabajar con **Git**, primero necesitas instalarlo en tu sistema. Puedes descargarlo desde la **[página oficial de Git](https://git-scm.com/download/)**. Para probar que lo tienes instalado, prueba a ejecutar el siguiente comando:
 
 ```sh
 git --version
 ```
-Deberías poder visualizar la versión de Git más reciente que tienes instalada. Al confirmar la instalación, ahora sí podrás empezar viendo los comandos de Git.
+
+#### Configuración inicial
+
+Antes de empezar a crear commits y ramas, debemos decirle a **Git** quién esta editando. Esto es de **mucha importancia**, ya que cada commit quedará registrado con tu nombre y correo identificando tu trabajo *(y otros colaboradores sabrán a quién felicitar... o **reclamar**)*
+
+- **Tu nombre y correo:** Estos datos aparecerán en el historial de commits:
+
+```sh
+git config --global user.name "[tu_nombre]"
+```
+```sh
+git config --global user.email "[tu_correo@ejemplo.com]"
+```
+> La flag *--global* afecta a todos los repositorios locales en tu máquina.
+
+> [!TIP]
+> Usa el mismo correo que tienes registrado en **GitHub**, así tu avatar aparecerá automáticamente en los commits.
+
+**Ver la configuración actual:** Para asegurarte que todo está correcto:
+
+```sh
+git config --list
+```
+**Opciones útiles (recomendadas):** Aunque no son obligatorias, estas opciones mejoran la experiencia con **Git**:
+
+- **Cambiar el editor de texto:** Git necesita un editor de texto para mensajes de commits y merges. Configura `Visual Studio Code` como editor predeterminado:
+
+```sh
+git config --global core.editor "code --wait"
+```
+- **Configurar la rama principal:** Por defecto, Git usa `master` como nombre de la rama principal. Puedes cambiarlo a `production` u otro nombre que prefieras:
+
+```sh
+git config --global init.defaultBranch [nombre_rama]
+```
+
+- **Almacenar credenciales:** Si usas HTTPS para clonar repositorios, puedes configurar **Git** para que recuerde tus credenciales y no te las pida cada vez que hagas `push` o `pull`:
+
+```sh
+git config --global credential.helper store
+```
 
 ---
 
-<h3>Configuración inicial básica</h3>
-
-Cuando usas Git, es importante que cada commit esté asociado a un autor para saber claramente quien ha hecho los cambios. Esta información incluye tu nombre y dirección de correo.
-
-- **Configurar dirección de correo:**
-Asocia tu dirección de correo a los *commits* que hagas en cualquier repositorio. Asegúrate de usar el mismo correo que usas en GitHub para asociarlo correctamente.
-
-```sh
-  git config --global user.email "correo@ejemplo.com"
-```
-
-- **Configurar nombre del autor:**
-Asocia tu nombre a los *commits*, de modo que cada cambio que realices quede registrado con tu nombre.
-
-```sh
-  git config --global user.name "{nombre}"
-```
-
-> [!NOTE]
-> La flag **--global** afecta globalmente a todos los repositorios locales. Si deseas que la configuración solo afecte al repositorio local actual, omítela.
-
----
-
-<h3>Inicialización de proyectos</h3>
+### Inicialización y conexión a un repositorio remoto
 
 ```sh
 git init
