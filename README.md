@@ -66,33 +66,44 @@ git config --global credential.helper store
 
 ---
 
-### Inicialización y conexión a un repositorio remoto
+### Empezando un proyecto con Git
+
+Cuando comienzas un nuevo proyecto o te unes a uno existe, lo primero es **inicializar** el repositorio local y **enlazarlo** a un repositorio remoto. Aquí verás los comandos para crear un repositorio local y conectarlo a un remoto.
+
+1. **Crear un repositorio local**
 
 ```sh
 git init
 ```
-**Inicializa** el repositorio local en la carpeta actual donde te encuentres. Esto generará un directorio `.git` para almacenar el historial del proyecto.
+**Inicializa** el repositorio local en la carpeta actual. Esto genera un directorio oculto `.git/` donde se guardará todo el historial de tu proyecto.
+
+2. **Enlazar a un repositorio remoto**
 
 ```sh
-git remote add <remoto> <repositorio>
+git remote add <remoto> <url_del_repositorio>
 ```
-Agrega un **repositorio remoto** al proyecto local. Este comando es útil después de inicializar un proyecto para **enlazarlo** a un repositorio remoto.
+Una vez que tienes tu repo local, puedes enlazarlo a un **repositorio remoto** *(por ejemplo, en GitHub, GitLab, etc.)* para poder **subir** y **descargar** cambios.
 
-- **Flags útiles del comando:**
-  - **`git remote rm <remoto>` →** **Elimina** el repositorio remoto.
-  - **`git remote show <remoto>` →** **Información** del repositorio.
+**Flags útiles:**
+- `git remote -v` → Muestra las URLs de los repositorios remotos enlazados *(fetch y push)*
+- `git remote remove <remoto>` → Elimina el enlace al repositorio remoto.
+- `git remote prune <remoto>` → Elimina referencias a ramas remotas que ya no existen.
+- `git remote show <remoto>` → Muestra información detallada del remoto especificado.
 
 > [!NOTE]
-> Por lo general, **`<remoto>`** por convención deberá de ser **origin**. Sin embargo, puedes nombrar el remoto como prefieras si se trabaja con múltiples remotos.
+> El nombre más común para el **remoto** es `origin`, pero puedes otro nombre si manejas varios remotos *(por ejemplo, `upstream` o `fork`)*
+
+1. Clonar un proyecto existente
 
 ```sh
-git clone <url-del-repositorio>
+git clone <url_del_repositorio>
 ```
-**Clona** un repositorio remoto, este comando **inicializa** y **enlaza** creando un repositorio local. Por ejemplo, `git clone https://github.com/bmmedina99/git-practice.git`
+Si el proyecto ya existe en un repositorio remoto, en lugar de `init` usarás `clone`. Esto crea una carpeta con el código, el historial y la conexión al remoto.
 
-- **Flags útiles del comando:**
-  - **`git clone -b <rama> <URL_del_repositorio>` →** Clona la **rama especificada** del repositorio remoto.
-  - **`git clone --single-branch <URL_del_repositorio>` →** Clona solo la rama especificada **sin el seguimiento remoto**.
+**Flags útiles:**
+- `git clone --depth <n> <url_del_repositorio>` → Clona solo los últimos **n** commits.
+- `git clone --branch <rama> <url_del_repositorio>` → Clona una rama específica.
+- `git clone --single-branch <url_del_repositorio>` → Clona solo la rama por defecto sin otras ramas.
 
 ---
 
