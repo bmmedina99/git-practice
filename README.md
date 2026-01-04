@@ -68,7 +68,7 @@ git config --global credential.helper store
 
 ### Empezando un proyecto con Git
 
-Cuando comienzas un nuevo proyecto o te unes a uno existe, lo primero es **inicializar** el repositorio local y **enlazarlo** a un repositorio remoto. Aquí verás los comandos para crear un repositorio local y conectarlo a un remoto.
+Cuando comienzas un nuevo proyecto o te unes a uno existe, lo primero es **inicializar** el repositorio local y **enlazarlo** a un repositorio remoto.
 
 1. **Crear un repositorio local**
 
@@ -93,7 +93,7 @@ Una vez que tienes tu repo local, puedes enlazarlo a un **repositorio remoto** *
 > [!NOTE]
 > El nombre más común para el **remoto** es `origin`, pero puedes otro nombre si manejas varios remotos *(por ejemplo, `upstream` o `fork`)*
 
-1. Clonar un proyecto existente
+3. **Clonar un proyecto existente**
 
 ```sh
 git clone <url_del_repositorio>
@@ -107,48 +107,77 @@ Si el proyecto ya existe en un repositorio remoto, en lugar de `init` usarás `c
 
 ---
 
-<h3>Primer commit y seguimiento de archivos</h3>
+### Primer commit y seguimiento de archivos
+
+Antes de guardar cambios, Git necesita saber **qué archivos han cambiado** y cuáles quieres incluir en el siguiente **commit** *(guardado de cambios)*
+
+4. **Ver el estado del repositorio**
 
 ```sh
 git status
 ```
-Muestra el estado del repositorio, indicando los archivos **modificados**, **agregados** o **eliminados**, y cuáles están listos para ser **confirmados**.
+Muestra el estado actual del repositorio local, qué archivos están **modificados**, **agregados**, **eliminados** o **sin seguimiento** *(untracked)*.
 
-- **Flags útiles del comando:**
-  - **`git status -s` →** Muestra el estado en un formato más **compacto** y **legible**.
-    - **`M`**: Modificado
-    - **`A`**: Agregado *(staged)*
-    - **`D`**: Eliminado
-    - **`??`**: No rastreado *(untracked)*
-  - **`git status -sb` →** Agrega a la muestra la rama en la que te encuentras.
+**Flags útiles:**
+- `git status -s` → Muestra el estado en formato compacto.
+  - **`M`**: Modificado | **`A`**: Agregado *(staged)* | **`D`**: Eliminado | **`??`**: Sin seguimiento *(untracked)*
+- `git status -b` → Muestra información de la rama actual.
+
+5. **Agregar archivos al área de preparación (staging area)**
 
 ```sh
 git add <archivo>
 ```
-**Agrega** un archivo especifico modificado al área de preparación *(staging area)* para ser incluidos en el siguiente **commit**.
+Agrega un archivo específico al área de preparación *(staging area)*, indicando que formará parte del próximo commit.
 
-- **Flags útiles del comando:**
-  - **`git add -A / git add .` →** Agrega todos los cambios, **incluyendo** archivos nuevos.
-  - **`git add -u` →** Agrega todos los cambios, pero **omite** los no rastreados *(untracked)*.
+- **Flags útiles:**
+  - `git add .` → Agrega todos los cambios, **incluyendo** archivos nuevos.
+  - `git add -u` → Agrega solo archivos modificados y eliminados, **excluyendo** archivos nuevos.
+
+6. **Quitar archivos del área de preparación (staging area)**
 
 ```sh
-git commit -m “<mensaje>”
+git restore <archivo>
 ```
-**Guarda** los cambios realizados en el área de preparación *(staging area)* en el repositorio local con un mensaje descriptivo de los cambios. Para los mensaje recomiendo usar el estándar de **[Conventional Commits](https://www.conventionalcommits.org/es/)**
+Restaura los cambios realizados a un archivo específico en el área de preparación *(staging area)*, quitándolo de la lista de archivos que serán incluidos en el próximo commit.
 
-- **Flags útiles del comando:**
-  - **`git commit -am “{m}”` →** **Agrega** y **guarda** con un mensaje, pero **excluye** los no rastreados.
-  - **`git commit --amend` →** Permite **modificar** el mensaje del commit más reciente.
+- **Flags útiles:**
+  - `git restore .` → Restaura todos los archivos modificados.
+  - `git restore --staged <archivo` → Agrega solo archivos modificados y eliminados, **excluyendo** archivos nuevos.
+
+7. **Guardar los cambios con un commit**
+
+```sh
+git commit
+```
+Guarda los cambios del área de preparación *(staging area)* en el repositorio local con un mensaje descriptivo.
+
+**Recomendación**:
+Usa el estándar de **[Conventional Commits](https://www.conventionalcommits.org/es/)** para que los mensajes sean claros.
+
+**Flags útiles:**
+- `git commit -m “<mensaje>”` → Crea un commit con el mensaje especificado directamente en la línea de comandos.
+- `git commit --amend` → Modifica el último commit, útil para corregir mensajes o agregar archivos olvidados.
+- `git commit --amend --no-edit` → Modifica el último commit sin cambiar el mensaje.
+
+8. **Ver el historial de commits**
 
 ```sh
 git log
 ```
-Muestra el **historial de commits** en la rama actual, lo que es útil para **revisar** los cambios anteriores.
+Muestra el historial de commits de la rama actual.
 
-- **Flags útiles del comando:**
-  - **`git log --graph --oneline --decorate` →** **Recomendado**, muestra el historial en una forma más **compacta** y con referencias entre las ramas.
-  - **`git log -n <nº>` →** Muestra únicamente el historial de los últimos **nº commits**.
-  - **`git log --author=<nombre>` →** Muestra únicamente los commits del **autor** especificado.
+**Flags útiles:**
+- `git log -n <nº>` → Muestra solo los últimos **nº** commits.
+- `git log --oneline` → Muestra cada commit en una línea.
+- `git log --graph` → Muestra el historial en forma de gráfico.
+- `git log --all` → Muestra el commit de todas las ramas.
+- `git log --stat` → Muestra estadísticas de los archivos modificados.
+- `git log --author=<nombre>` → Muestra únicamente los commits del autor especificado.
+
+> [!TIP]
+> Puedes combinar varias flags para personalizar la salida del historial, la combinación más popular es:
+> `git log --oneline --graph --all`
 
 ---
 
@@ -159,7 +188,7 @@ git branch
 ```
 **Muestra** las ramas locales existentes e indica en que rama te **encuentras** actualmente.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git branch <nombre_rama>` →** **Crea** una rama **nueva** con el **nombre** especificado.
   - **`git branch -m <nombre_viejo> <nombre_nuevo>` →** **Renombra** la rama especificada.
   - **`git branch -d <nombre_rama>` →** **Elimina** la rama local especificada ya fusionada.
@@ -175,7 +204,7 @@ git switch <rama>
 ```
 **Cambia** entre diferentes ramas en tu **repositorio local**. Es una **alternativa** a `git checkout`. Es una forma más clara y directa para cambiar entre ramas.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git switch -c <nombre_rama>` →** **Crea** una rama nueva y **cambia** a ella directamente.
   - **`git switch --detach <hash-commit>` →** **Cambia** a un commit especifico en un estado **desconectado** *(detached HEAD)*, es decir, cualquier cambio que se haga no será asociado.
   - **`git switch -` →** Un **atajo** que permite cambiar rápidamente a la **última rama** en la que estabas trabajando.
@@ -188,7 +217,7 @@ git checkout
 ```
 Comando **multiuso**, es el más **poderoso** de Git que se usaba en **muchas tareas** hasta que `git switch` y `git restore` se introdujeron para separar sus funciones.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git checkout <rama>` →** **Cambia** a una rama existente en tu **repositorio local**.
   - **`git checkout <hash-commit>` →** **Cambia** al commit especificado y te pone en un **estado** *(detached HEAD)*.
   - **`git checkout -b <nombre_rama>` →** **Crea** una nueva rama y **cambia** a ella directamente.
@@ -205,7 +234,7 @@ git fetch <remoto>
 ```
 **Descarga** los últimos cambios del **repositorio remoto**, pero no los aplica a tu rama actual hasta que no sea ejecuta el comando `git merge`.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git fetch <remoto> <rama>` →** **Descarga** solo una **rama** especifica del remoto.
   - **`git fetch --prune` →** Realiza una **limpieza** de referencias locales a las ramas remotas que ya no están en el repositorio remoto.
   - **`git fetch --dry-run` →** Realiza una **simulación** que te muestra qué cambios se descargarán del remoto sin **aplicarlos realmente**.
@@ -215,7 +244,7 @@ git merge <remoto>/<rama>
 ```
 **Fusiona** los cambios de una rama con otro. Por lo general, se usa después de un `git fetch`, ya que ese comando **descarga** los cambios del repositorio remoto.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git merge --no-ff <rama>` →** **Fuerza** a crearse un **commit de merge**. Útil si quieres mantener un historial explícito de cuándo se realizó la fusión.
   - **`git merge --squash <rama>` →** **Combina** todos los commits de una rama en un **solo** commit al hacer la fusión. Tendrás que hacer el commit **manualmente** con `git commit -m <mensaje>`
   - **`git merge --abort` →** Permite **abortar** una fusión en curso si se detectan problemas, como **conflictos** que no puedes o no quieres resolver en ese momento.
@@ -225,7 +254,7 @@ git pull
 ```
 **Descarga** los cambios del **repositorio remoto** y los **fusiona automáticamente** con tu rama actual. Es equivalente a `git fetch` seguido de `git merge`.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git pull <remoto> <rama>` →** **Descarga** y **fusiona** solo una **rama** especifica del remoto.
   - **`git pull --rebase` →** Descarga y fusiona, pero **reorganiza** los commits locales **encima de los cambios** traídos del remoto.
   - **`git pull --ff-only` →** Garantiza que no haya **conflictos** entre la rama local y la rama remota; si se detecta conflicto, el pull **fallará**.
@@ -235,7 +264,7 @@ git push
 ```
 **Sube** los commits de la **rama actual** al repositorio remoto. Debes hacerlo después de realizar un **commit** para **compartir** tus cambios.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git push <remoto> <rama>` →** **Sube** el commit reciente de la **rama local especificada** al **remoto especificado**.
   - **`git push --force-with-lease` →** **Fuerza** el *push* si no hay **commits nuevos** en el remoto que no tengas **localmente**.
   - **`git push --dry-run` →** Realiza una **simulación** que te muestra los cambios que serán **subidos** al repositorio remoto.
@@ -252,27 +281,17 @@ git diff <archivo>
 ```
 **Muestra** los cambios del archivo especificado, entre el **estado actual** y los cambios que aún no han sido **confirmados**.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git diff <hash-commit1> <hash-commit2>` →** **Compara** las diferencias entre dos **commits especificados**.
   - **`git diff --name-only` →** Muestra **solamente** el nombre de los archivos **modificados**.
   - **`git diff --stat` →** Muestra un resumen **estadístico** de los cambios.
-
-
-```sh
-git restore <archivo>
-```
-**Quita** un archivo del área de preparación *(staging area)*, pero **mantiene** los cambios locales. Útil si accidentalmente hiciste `git add` en un archivo que no querías incluir en el commit.
-
-- **Flags útiles del comando:**
-  - **`git restore --source=<hash-commit> <archivo>` →** **Restaura** el archivo al estado de un **commit** especifico sin **afectar** al resto de los archivos.
-  - **`git restore --worktree <archivo>` →** **Deshace** los cambios que has hecho y quede igual antes de cualquier **modificación**.
 
 ```sh
 git reset <archivo>
 ```
 **Deshace** los cambios no confirmados en un archivo, **restaurándolo** al estado del último commit.
 
-- **Flags útiles del comando:**
+- **Flags útiles:**
   - **`git reset --soft <hash-commit>` →** **Restablece** el puntero *(HEAD)* al commit especificado, pero **mantiene todos los cambios** en el área de preparación *(staging area)*.
   - **`git reset --mixed <hash-commit>` →** **Restablece** el puntero *(HEAD)* al commit especificado, **elimina los cambios** en el área de preparación *(staging area)*, pero **mantiene los cambios locales**.
   - **`git reset --hard <hash-commit>` →** **Restablece completamente** el puntero *(HEAD)* al commit especificado **eliminando completamente todo los cambios**.
