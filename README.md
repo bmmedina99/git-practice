@@ -152,8 +152,8 @@ git commit
 ```
 Guarda los cambios del área de preparación *(staging area)* en el repositorio local con un mensaje descriptivo.
 
-**Recomendación**:
-Usa el estándar de **[Conventional Commits](https://www.conventionalcommits.org/es/)** para que los mensajes sean claros.
+> [!NOTE]
+> Como una **recomendación** echa un vistazo al estándar de **[Conventional Commits](https://www.conventionalcommits.org/es/)** para que los mensajes sean más claros.
 
 **Flags útiles:**
 - `git commit -m “<mensaje>”` → Crea un commit con el mensaje especificado directamente en la línea de comandos.
@@ -181,7 +181,11 @@ Muestra el historial de commits de la rama actual.
 
 ---
 
-<h3>Trabajando con ramas</h3>
+### Trabajando con ramas
+
+Cuando tienes en mente una nueva idea o alguna correción, es buena práctica crear una **rama nueva** para trabajar en esos cambios sin afectar la rama principal.
+
+9. Listar y gestionar ramas
 
 ```sh
 git branch
@@ -199,6 +203,8 @@ git branch
 > [!TIP]
 > Flag extra `git branch --set-upstream-to=<remoto>/<rama_remota> <rama_local>`, se usa cuando ya existe una rama remota y solo necesitas configurar tu rama local para que siga a esa rama remota remota.
 
+10. Cambiar entre ramas
+
 ```sh
 git switch <rama>
 ```
@@ -211,6 +217,8 @@ git switch <rama>
 
 > [!NOTE]
 > El termino **`<hash-commit>`** hace referencia a un identificador único de un commit. Para visualizar este "hash" usa el comando recomendo de `git log`
+
+11. Comando legacy, pee
 
 ```sh
 git checkout
