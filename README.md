@@ -218,7 +218,7 @@ git switch <rama>
 > [!NOTE]
 > El termino **`<hash-commit>`** hace referencia a un identificador único de un commit. Para visualizar este "hash" usa el comando recomendo de `git log`
 
-11. Comando legacy, pee
+11. Comando legacy, pero multiuso
 
 ```sh
 git checkout
