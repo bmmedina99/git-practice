@@ -130,9 +130,9 @@ git add <archivo>
 ```
 Agrega un archivo específico al área de preparación *(staging area)*, indicando que formará parte del próximo commit.
 
-- **Flags útiles:**
-  - `git add .` → Agrega todos los cambios, **incluyendo** archivos nuevos.
-  - `git add -u` → Agrega solo archivos modificados y eliminados, **excluyendo** archivos nuevos.
+**Flags útiles:**
+- `git add .` → Agrega todos los cambios, **incluyendo** archivos nuevos.
+- `git add -u` → Agrega solo archivos modificados y eliminados, **excluyendo** archivos nuevos.
 
 6. **Quitar archivos del área de preparación (staging area)**
 
@@ -141,9 +141,9 @@ git restore <archivo>
 ```
 Restaura los cambios realizados a un archivo específico en el área de preparación *(staging area)*, quitándolo de la lista de archivos que serán incluidos en el próximo commit.
 
-- **Flags útiles:**
-  - `git restore .` → Restaura todos los archivos modificados.
-  - `git restore --staged <archivo` → Agrega solo archivos modificados y eliminados, **excluyendo** archivos nuevos.
+**Flags útiles:**
+- `git restore .` → Restaura todos los archivos modificados.
+- `git restore --staged <archivo` → Agrega solo archivos modificados y eliminados, **excluyendo** archivos nuevos.
 
 7. **Guardar los cambios con un commit**
 
@@ -230,50 +230,67 @@ Comando multiuso que antes usaba para todo, pero ahora se recomienda usar `git s
 
 ---
 
-<h3>Actualización y colaboración</h3>
+### Sincronizando y colaboración con repositorios remoto
+
+12. Descargar cambios sin aplicarlos
 
 ```sh
-git fetch <remoto>
+git fetch
 ```
-**Descarga** los últimos cambios del **repositorio remoto**, pero no los aplica a tu rama actual hasta que no sea ejecuta el comando `git merge`.
+Descarga los últimos cambios del repositorio remoto por defecto *(origin)*, pero **no los aplica** automáticamente a tu rama actual. Esto te permite revisar los cambios antes de integrarlos.
 
-- **Flags útiles:**
-  - **`git fetch <remoto> <rama>` →** **Descarga** solo una **rama** especifica del remoto.
-  - **`git fetch --prune` →** Realiza una **limpieza** de referencias locales a las ramas remotas que ya no están en el repositorio remoto.
-  - **`git fetch --dry-run` →** Realiza una **simulación** que te muestra qué cambios se descargarán del remoto sin **aplicarlos realmente**.
+**Flags útiles:**
+- `git fetch <remoto>` → Descarga cambios de un remoto específico.
+- `git fetch <remoto> <rama>` → Descarga cambios de una rama específica del remoto.
+- `git fetch --prune` → Elimina referencias a ramas remotas que ya no existen.
+- `git fetch --dry-run` → Simula el fetch sin descargar nada, mostrando qué cambios se descargarían.
+
+13.  Fusionar cambios descargados
 
 ```sh
-git merge <remoto>/<rama>
+git merge <rama>
 ```
-**Fusiona** los cambios de una rama con otro. Por lo general, se usa después de un `git fetch`, ya que ese comando **descarga** los cambios del repositorio remoto.
+Fusiona los cambios de otra rama con tu rama actual. Usualmente se usa después de `git fetch` para integrar los cambios descargados.
 
-- **Flags útiles:**
-  - **`git merge --no-ff <rama>` →** **Fuerza** a crearse un **commit de merge**. Útil si quieres mantener un historial explícito de cuándo se realizó la fusión.
-  - **`git merge --squash <rama>` →** **Combina** todos los commits de una rama en un **solo** commit al hacer la fusión. Tendrás que hacer el commit **manualmente** con `git commit -m <mensaje>`
-  - **`git merge --abort` →** Permite **abortar** una fusión en curso si se detectan problemas, como **conflictos** que no puedes o no quieres resolver en ese momento.
+**Flags útiles:**
+- `git merge --no-ff <rama>` → Fuerza un merge commit incluso si es posible un *fast-forward*.
+- `git merge --ff-only <rama>` → Solo permite *fast-forward*, fallando si no es posible.
+- `git merge --abort` → Cancela la fusión en curso si hay conflictos.
+- `git merge --continue` → Continúa una fusión después de resolver conflictos.
+- `git merge --squash <rama>` → Fusiona los cambios de la rama especificada en un solo commit sin crear un merge commit.
+
+> [!NOTE]
+> El *fast-forward* ocurre cuando la rama actual puede avanzar directamente a la punta de la otra rama sin necesidad de un commit de fusión.
+
+14. Descargar y fusionar en un solo paso
 
 ```sh
 git pull
 ```
-**Descarga** los cambios del **repositorio remoto** y los **fusiona automáticamente** con tu rama actual. Es equivalente a `git fetch` seguido de `git merge`.
+Descarga los cambios del remoto y los fusiona automáticamente con tu rama actual. Es una combinación de `git fetch` seguido de `git merge`. **Úsalo cuando confíes en que no habrá conflictos**.
 
-- **Flags útiles:**
-  - **`git pull <remoto> <rama>` →** **Descarga** y **fusiona** solo una **rama** especifica del remoto.
-  - **`git pull --rebase` →** Descarga y fusiona, pero **reorganiza** los commits locales **encima de los cambios** traídos del remoto.
-  - **`git pull --ff-only` →** Garantiza que no haya **conflictos** entre la rama local y la rama remota; si se detecta conflicto, el pull **fallará**.
+**Flags útiles:**
+- `git pull <remoto> <rama>` → Descarga y fusiona una rama específica de un remoto específico.
+- `git pull --rebase` → Usa rebase en lugar de merge para integrar los cambios.
+- `git pull --ff-only` → Solo permite *fast-forward*, fallando si no es posible.
+- `git pull --prune` → Elimina referencias a ramas remotas que ya no existen.
+
+15. Subir cambios al repositorio remoto
 
 ```sh
 git push
 ```
-**Sube** los commits de la **rama actual** al repositorio remoto. Debes hacerlo después de realizar un **commit** para **compartir** tus cambios.
+Sube los commits de tu rama local al repositorio remoto asociado.
 
-- **Flags útiles:**
-  - **`git push <remoto> <rama>` →** **Sube** el commit reciente de la **rama local especificada** al **remoto especificado**.
-  - **`git push --force-with-lease` →** **Fuerza** el *push* si no hay **commits nuevos** en el remoto que no tengas **localmente**.
-  - **`git push --dry-run` →** Realiza una **simulación** que te muestra los cambios que serán **subidos** al repositorio remoto.
+**Flags útiles:**
+- `git push <remoto> <rama>` → Sube los commits a un remoto y rama específicos.
+- `git push -u <remoto> <rama>` → Sube los commits y establece la rama remota como seguimiento de la rama local.
+- `git push --force` → Fuerza el push, sobrescribiendo los cambios en el remoto *(usar con precaución)*.
+- `git push --force-with-lease` → Fuerza el push de forma segura, solo si no hay cambios nuevos en el remoto.
+- `git push --dry-run` → Simula el push sin subir nada, mostrando qué cambios se subirían.
 
-> [!TIP]
-> Flag extra `git push --set-upstream <remoto> <rama>`, se usa cuando creas una nueva rama local y quieres subirla al repositorio remoto por primera vez. Es útil porque establece tanto la rama remota como el siguimiento.
+> [!WARNING]
+> El comando de `git push --force` debe usarse con extrema precaución, ya que puede sobrescribir los cambios en el repositorio remoto y causar pérdida de datos para otros colaboradores. Usalo en ramas personales que solo tú uses.
 
 ---
 
