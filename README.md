@@ -192,46 +192,41 @@ git branch
 ```
 **Muestra** las ramas locales existentes e indica en que rama te **encuentras** actualmente.
 
-- **Flags útiles:**
-  - **`git branch <nombre_rama>` →** **Crea** una rama **nueva** con el **nombre** especificado.
-  - **`git branch -m <nombre_viejo> <nombre_nuevo>` →** **Renombra** la rama especificada.
-  - **`git branch -d <nombre_rama>` →** **Elimina** la rama local especificada ya fusionada.
-  - **`git branch -v` →** Muestra las ramas locales con el último **commit** asociado a cada rama.
-  - **`git branch -r` →** Muestra **solo** las **ramas remotas**.
-  - **`git branch -a` →** Muestra **todas las ramas** locales y remotas.
+**Flags útiles:**
+- `git branch <nombre>` → Crea una nueva rama local.
+- `git branch -m <nombre_nuevo>` → Renombra la rama actual.
+- `git branch -m <viejo> <nuevo>` → Renombra una rama especificada.
+- `git branch -d <nombre>` → Elimina una rama (solo si está fusionada)
+- `git branch -D <nombre>` → Fuerza la eliminación de una rama local.
+- `git branch -r` → Muestra solo las ramas remotas.
+- `git branch -v` → Muestra el último commit de cada rama.
 
 > [!TIP]
-> Flag extra `git branch --set-upstream-to=<remoto>/<rama_remota> <rama_local>`, se usa cuando ya existe una rama remota y solo necesitas configurar tu rama local para que siga a esa rama remota remota.
+> Usa esta flag extra `git branch --set-upstream-to=<remoto>/<rama_remota> <rama_local>`, para establecer una rama remota como seguimiento de una rama local.
 
-10. Cambiar entre ramas
+10.  Cambiar entre ramas *(forma moderna)*
 
 ```sh
 git switch <rama>
 ```
-**Cambia** entre diferentes ramas en tu **repositorio local**. Es una **alternativa** a `git checkout`. Es una forma más clara y directa para cambiar entre ramas.
+Cambia a una rama existente en tu repositorio local.
 
-- **Flags útiles:**
-  - **`git switch -c <nombre_rama>` →** **Crea** una rama nueva y **cambia** a ella directamente.
-  - **`git switch --detach <hash-commit>` →** **Cambia** a un commit especifico en un estado **desconectado** *(detached HEAD)*, es decir, cualquier cambio que se haga no será asociado.
-  - **`git switch -` →** Un **atajo** que permite cambiar rápidamente a la **última rama** en la que estabas trabajando.
+**Flags útiles:**
+- `git switch -` → Cambia a la rama anterior en la que estabas trabajando.
+- `git switch -c <rama>` → Crea y cambia a una nueva rama.
 
-> [!NOTE]
-> El termino **`<hash-commit>`** hace referencia a un identificador único de un commit. Para visualizar este "hash" usa el comando recomendo de `git log`
-
-11. Comando legacy, pero multiuso
+11.  Comando legacy, pero multiuso
 
 ```sh
 git checkout
 ```
-Comando **multiuso**, es el más **poderoso** de Git que se usaba en **muchas tareas** hasta que `git switch` y `git restore` se introdujeron para separar sus funciones.
+Comando multiuso que antes usaba para todo, pero ahora se recomienda usar `git switch` para cambiar ramas y `git restore` para restaurar archivos.
 
-- **Flags útiles:**
-  - **`git checkout <rama>` →** **Cambia** a una rama existente en tu **repositorio local**.
-  - **`git checkout <hash-commit>` →** **Cambia** al commit especificado y te pone en un **estado** *(detached HEAD)*.
-  - **`git checkout -b <nombre_rama>` →** **Crea** una nueva rama y **cambia** a ella directamente.
-  - **`git checkout -- <archivo>` →** **Restaura** un archivo especifico al estado del **último commit** sin afectar otros archivos.
-  - **`git checkout <hash-commit> -- <archivo>` →** **Restaura** un archivo especifico al estado de un **commit especifico** sin afectar otros archivos.
-  - **`git checkout -` →** Un **atajo** equivalente al comando `git switch -`
+**Flags útiles:**
+- `git checkout <rama>` → Cambia de rama.
+- `git checkout -b <nombre_rama>` → Crea y cambia a una nueva rama.
+- `git checkout -` → Cambia a la rama anterior. Equivalente a `git switch -`.
+- `git checkout -- <archivo>` → Descarta cambios en un archivo *(obsoleto, usar `git restore`)*
 
 ---
 
