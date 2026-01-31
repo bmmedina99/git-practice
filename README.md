@@ -238,7 +238,9 @@ Comando multiuso que antes usaba para todo, pero ahora se recomienda usar `git s
 
 ### Sincronizando y colaboración con repositorios remoto
 
-12. Descargar cambios sin aplicarlos
+Aquí es donde vemos el verdadero **poder de Git**, al permitirnos colaborar con otros desarrolladores y mantener nuestro código sincronizado con un **repositorio remoto**.
+
+1.  Descargar cambios sin aplicarlos
 
 ```sh
 git fetch
@@ -300,7 +302,7 @@ Sube los commits de tu rama local al repositorio remoto asociado.
 
 ---
 
-<h3>Resolución de problemas y revisión del historial</h3>
+### Inspección de cambios y resolución de errores
 
 ```sh
 git diff <archivo>
