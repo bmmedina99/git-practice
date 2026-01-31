@@ -40,12 +40,18 @@ git config --global user.email "[tu_correo@ejemplo.com]"
 > [!TIP]
 > Usa el mismo correo que tienes registrado en **GitHub**, así tu avatar aparecerá automáticamente en los commits.
 
-**Ver la configuración actual:** Para asegurarte que todo está correcto:
+**Para ver la configuración actual:**
 
 ```sh
 git config --list
 ```
-**Opciones útiles (recomendadas):** Aunque no son obligatorias, estas opciones mejoran la experiencia con **Git**:
+Si al comando anterior le agregas la flag `--global`, verás solo la configuración global:
+
+```sh
+git config --global --list
+```
+
+**Otras configuraciones (recomendadas):** Aunque no son obligatorias, estas opciones mejoran la experiencia con **Git**:
 
 - **Cambiar el editor de texto:** Git necesita un editor de texto para mensajes de commits y merges. Configura `Visual Studio Code` como editor predeterminado:
 
