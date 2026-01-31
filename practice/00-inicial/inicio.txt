@@ -1,1 +1,5 @@
-Este es mi primer fichero en git-practice
+Inicializa un nuevo proyecto de git
+
+Recuerda usar el comando adecuado:
+
+git init
