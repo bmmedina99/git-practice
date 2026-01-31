@@ -304,25 +304,46 @@ Sube los commits de tu rama local al repositorio remoto asociado.
 
 ### Inspección de cambios y resolución de errores
 
+Si alguna vez te preguntas *¿qué cambio hice?* o *¿cómo deshago esto?*, estos comandos te ayudarán a inspeccionar y revertir cambios en tu repositorio.
+
+16. Ver diferencias entre cambios
+
 ```sh
 git diff <archivo>
 ```
 **Muestra** los cambios del archivo especificado, entre el **estado actual** y los cambios que aún no han sido **confirmados**.
 
-- **Flags útiles:**
-  - **`git diff <hash-commit1> <hash-commit2>` →** **Compara** las diferencias entre dos **commits especificados**.
-  - **`git diff --name-only` →** Muestra **solamente** el nombre de los archivos **modificados**.
-  - **`git diff --stat` →** Muestra un resumen **estadístico** de los cambios.
+**Flags útiles:**
+- `git diff HEAD` → Compara el estado actual con el último commit.
+- `git diff <commit1> <commit2>` → Compara dos commits específicos.
+- `git diff --name-only` → Muestra solo los archivos modificados.
+- `git diff --stat` → Resumen estadístico de los cambios.
+
+1.  Deshacer cambios en archivos
 
 ```sh
-git reset <archivo>
+git reset
 ```
-**Deshace** los cambios no confirmados en un archivo, **restaurándolo** al estado del último commit.
+Quita todos los archivos del área de preparación *(staging area)*, manteniendo los cambios locales en el directorio de trabajo.
 
-- **Flags útiles:**
-  - **`git reset --soft <hash-commit>` →** **Restablece** el puntero *(HEAD)* al commit especificado, pero **mantiene todos los cambios** en el área de preparación *(staging area)*.
-  - **`git reset --mixed <hash-commit>` →** **Restablece** el puntero *(HEAD)* al commit especificado, **elimina los cambios** en el área de preparación *(staging area)*, pero **mantiene los cambios locales**.
-  - **`git reset --hard <hash-commit>` →** **Restablece completamente** el puntero *(HEAD)* al commit especificado **eliminando completamente todo los cambios**.
+**Flags útiles:**
+- `git reset --soft <commit>` → Mueve el HEAD al commit, matiene *staging area* y *working directory*.
+- `git reset --mixed <commit>` → *(por defecto)* Mueve el HEAD al commit, limpia el *staging area* pero mantiene los cambios en el *working directory*.
+- `git reset --hard <commit>` → Mueve el HEAD al commit, limpia el *staging area* y el *working directory*, perdiendo todos los cambios no confirmados.
+- `git reset HEAD~1` → Deshace el último commit, manteniendo los cambios en el *working directory*. *Cambia el número en el HEAD para deshacer más commits*
 
 > [!CAUTION]
-> El uso del flag **--hard** debe hacerse con extrema precaución dado que eliminará permanentemente todos los cambios no confirmados en el área de trabajo y el área de preparación.
+> El uso del flag **--hard** debe hacerse con extrema precaución. Ese flag **ELIMINA** cambios permanentemente y es **IRRECUPERABLE** en la mayoría de casos.
+
+1.  Revertir un commit específico
+
+```sh
+git revert <commit>
+```
+Crea un nuevo commit que deshace los cambios introducidos por un commit anterior específico, sin alterar el historial de commits.
+
+**Flags útiles:**
+- `git revert HEAD` → Reverte el último commit.
+- `git revert --no-commit <commit>` → Prepara los cambios para revertir sin crear un commit automáticamente.
+- `git revert --continue <commit>` → Continúa el proceso de revertir después de resolver conflictos.
+- `git revert --abort` → Cancela el proceso de revertir si hay conflictos.
