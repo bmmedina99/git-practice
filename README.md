@@ -1,5 +1,8 @@
 ![Guía práctica de comandos básicos de Git](./assets/banner-git.png)
 
+> **Esta guía está en contanste mejora**<br>
+> El objetivo no es solo mostrar los comandos, sino ayudar  a entender cómo y cuándo usarlos en situaciones reales de desarrollo.
+
 # ¿Qué es Git?
 
 Cuando estamos creando un proyecto queremos mantenerlo seguro a los cambios y aquí es donde entra **Git** un **sistema de control de versiones distribuido**, guardando snapshots de tu código *(commits)* ayudando a comparar y revertir cambios sin perder historial.
