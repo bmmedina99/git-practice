@@ -322,7 +322,7 @@ git diff <archivo>
 - `git diff --name-only` → Muestra solo los archivos modificados.
 - `git diff --stat` → Resumen estadístico de los cambios.
 
-1.  Deshacer cambios en archivos
+17.  Deshacer cambios en archivos
 
 ```sh
 git reset
@@ -338,7 +338,7 @@ Quita todos los archivos del área de preparación *(staging area)*, manteniendo
 > [!CAUTION]
 > El uso del flag **--hard** debe hacerse con extrema precaución. Ese flag **ELIMINA** cambios permanentemente y es **IRRECUPERABLE** en la mayoría de casos.
 
-1.  Revertir un commit específico
+18.  Revertir un commit específico
 
 ```sh
 git revert <commit>
