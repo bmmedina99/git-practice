@@ -4,9 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "fmt": "biome format --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
   },
   "keywords": [],
   "author": "bmmedina99",
-  "license": "AGPL-3.0-or-later"
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15"
+  }
 }
