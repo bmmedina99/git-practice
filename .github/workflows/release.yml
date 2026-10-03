@@ -1,0 +1,36 @@
+name: Release KiraKana
+
+on:
+  push:
+    branches: [production]
+
+env:
+  NODE_VERSION: 24
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+
+      - name: Usando Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Instalando dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Lanzando release
+        run: pnpm run release
