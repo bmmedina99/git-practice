@@ -1,0 +1,47 @@
+name: PR Changelog Entry
+
+on:
+  pull_request:
+    branches: [develop]
+    types: [closed]
+
+jobs:
+  add-entry:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Crear entrada de changelog
+        run: |
+          set -e
+          PR_NUM="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+
+          mkdir -p changelog.d
+
+          # Extraer tipo desde el título (asume conventional commits en el título)
+          if [[ "$PR_TITLE" =~ ^feat ]]; then
+            TYPE="Features"
+          elif [[ "$PR_TITLE" =~ ^fix ]]; then
+            TYPE="Bug Fixes"
+          else
+            TYPE="Other"
+          fi
+
+          # Limpiar el prefijo conventional para el mensaje limpio
+          CLEAN_MSG=$(echo "$PR_TITLE" | sed 's/^[a-z!]\+(!\)\?\([^)]*\)\{0,1\}\: //')
+
+          echo "- ${CLEAN_MSG} (PR #${PR_NUM} por @${PR_AUTHOR})" \
+            > "changelog.d/PR-${PR_NUM}.md"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add changelog.d/
+          git commit -m "docs(changelog): add entry for PR #${PR_NUM} [skip ci]"
+          git push origin develop

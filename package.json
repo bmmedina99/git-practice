@@ -1,0 +1,17 @@
+{
+  "name": "git-practice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "fmt": "biome format --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
+  },
+  "keywords": [],
+  "author": "bmmedina99",
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15"
+  }
+}

@@ -1,0 +1,120 @@
+name: Release
+
+on:
+  push:
+    branches: [production]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determinar versión y generar changelog
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+
+          # --- 1. Último tag publicado ---
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          # --- 2. Commits desde el último tag (o todos si no hay) ---
+          if [ -z "$PREV_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"%s" --no-merges)
+          else
+            COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"%s" --no-merges)
+          fi
+
+          # --- 3. Clasificar por tipo (conventional commits) ---
+          BREAKING=""
+          FEATURES=""
+          FIXES=""
+          OTHER=""
+
+          while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            if [[ "$line" =~ ^[a-z]+\([^)]+\)!\: | "$line" == *"BREAKING CHANGE"* ]]; then
+              BREAKING="${BREAKING}- ${line}\n"
+            elif [[ "$line" =~ ^feat(\(|:|\$) ]]; then
+              FEATURES="${FEATURES}- ${line}\n"
+            elif [[ "$line" =~ ^fix(\(|:|\$) ]]; then
+              FIXES="${FIXES}- ${line}\n"
+            else
+              OTHER="${OTHER}- ${line}\n"
+            fi
+          done <<< "$COMMITS"
+
+          # --- 4. Calcular bump ---
+          if [ -n "$BREAKING" ]; then
+            BUMP="major"
+          elif [ -n "$FEATURES" ]; then
+            BUMP="minor"
+          elif [ -n "$FIXES" ]; then
+            BUMP="patch"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # --- 5. Calcular nueva versión desde el tag anterior ---
+          if [ -z "$PREV_TAG" ]; then
+            NEW_VERSION="0.1.0"
+          else
+            # Extraer semver del tag (asume formato vX.Y.Z)
+            CUR="${PREV_TAG#v}"
+            MAJOR=$(echo "$CUR" | cut -d. -f1)
+            MINOR=$(echo "$CUR" | cut -d. -f2)
+            PATCH=$(echo "$CUR" | cut -d. -f3)
+            case "$BUMP" in
+              major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
+              minor) MINOR=$((MINOR+1)); PATCH=0 ;;
+              patch) PATCH=$((PATCH+1)) ;;
+            esac
+            NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          fi
+
+          TAG="v${NEW_VERSION}"
+
+          # --- 6. Construir CHANGELOG.md ---
+          DATE=$(date +%Y-%m-%d)
+          {
+            echo "## ${TAG} - ${DATE}"
+            echo ""
+            [ -n "$BREAKING" ] && { echo "### Breaking Changes"; echo -e "$BREAKING"; }
+            [ -n "$FEATURES" ] && { echo "### Features"; echo -e "$FEATURES"; }
+            [ -n "$FIXES" ]    && { echo "### Bug Fixes"; echo -e "$FIXES"; }
+            [ -n "$OTHER" ]    && { echo "### Other"; echo -e "$OTHER"; }
+          } > /tmp/release_notes.md
+
+          # Prepend al CHANGELOG.md existente
+          if [ -f CHANGELOG.md ]; then
+            cat /tmp/release_notes.md > /tmp/new_changelog.md
+            echo "" >> /tmp/new_changelog.md
+            cat CHANGELOG.md >> /tmp/new_changelog.md
+            mv /tmp/new_changelog.md CHANGELOG.md
+          else
+            echo "# Changelog" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            cat /tmp/release_notes.md >> CHANGELOG.md
+          fi
+
+          # --- 7. Commit + tag + push ---
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore(release): ${TAG} [skip ci]"
+          git tag "$TAG"
+          git push origin production --tags
+
+          # --- 8. Crear GitHub Release ---
+          gh release create "$TAG" --title "$TAG" \
+            --notes-file /tmp/release_notes.md --latest
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
