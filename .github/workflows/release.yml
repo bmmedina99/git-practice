@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    branches: [production]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Calcular versión y notas sin modificar ni publicar nada
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+# Never cancel a run between pushing its tag and creating its GitHub release.
+concurrency:
+  group: release-production
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/production'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: production
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Test release tooling
+        run: node --test scripts/release/*.test.mjs
+
+      - name: Calculate and publish release
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            node scripts/release/release.mjs --dry-run
+          else
+            node scripts/release/release.mjs --publish
+          fi
