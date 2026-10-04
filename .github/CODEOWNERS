@@ -1,0 +1,5 @@
+# GitHub requests review from this owner for non-draft pull requests.
+# This file must exist on the PR's base branch (develop and production).
+# Authors cannot review their own pull requests.
+* @bmmedina99
+
