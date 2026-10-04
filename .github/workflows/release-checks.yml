@@ -38,7 +38,7 @@ jobs:
           node --input-type=module <<'NODE'
           import { parseConventionalCommit } from './scripts/release/core.mjs';
           if (!parseConventionalCommit(process.env.PR_TITLE)) {
-            console.error('El título del PR debe usar Conventional Commits: feat(kana): añadir práctica');
+            console.error('El título del PR debe usar Conventional Commits: feat(kana): add new kana');
             process.exitCode = 1;
           }
           NODE
