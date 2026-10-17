@@ -6,14 +6,18 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Calcular versión y notas sin modificar ni publicar nada
+        description: Calculate version and notes without changing or publishing the repository
         type: boolean
         default: true
 
 permissions:
   contents: read
 
-# Never cancel a run between pushing its tag and creating its GitHub release.
+defaults:
+  run:
+    shell: bash
+
+# Do not cancel between the atomic push and GitHub release creation.
 concurrency:
   group: release-production
   cancel-in-progress: false
@@ -26,6 +30,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: read
+    env:
+      GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -33,21 +40,79 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.RELEASE_TOKEN || github.token }}
 
-      - uses: actions/setup-node@v7
+      - name: Set up pnpm and Node.js
+        uses: pnpm/setup@v2
         with:
-          node-version: '24'
-          package-manager-cache: false
+          runtime: node@24
+          cache: true
+          install: false
 
-      - name: Test release tooling
-        run: node --test scripts/release/*.test.mjs
+      - name: Install release development tools
+        run: pnpm install --frozen-lockfile
 
-      - name: Calculate and publish release
-        env:
-          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
-          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+      - name: Check types and test release tooling
         run: |
-          if [ "$DRY_RUN" = "true" ]; then
-            node scripts/release/release.mjs --dry-run
-          else
-            node scripts/release/release.mjs --publish
+          pnpm run typecheck:release
+          pnpm run test:release
+
+      - name: Prepare release plan and files
+        id: plan
+        run: |
+          RELEASE_DIR="$(mktemp -d "$RUNNER_TEMP/release.XXXXXX")"
+          printf 'RELEASE_DIR=%s\n' "$RELEASE_DIR" >> "$GITHUB_ENV"
+          node scripts/release/release.ts --output-dir "$RELEASE_DIR"
+
+      - name: Recover pending GitHub release
+        id: recover
+        if: env.DRY_RUN != 'true' && steps.plan.outputs.pending == 'true'
+        env:
+          TAG: ${{ steps.plan.outputs.pending_tag }}
+        run: |
+          gh release create "$TAG" --verify-tag --title "$TAG" \
+            --notes-file "$RELEASE_DIR/pending-notes.md"
+
+      - name: Commit release files and push branch and tag atomically
+        id: push
+        if: env.DRY_RUN != 'true' && steps.plan.outputs.release == 'true'
+        env:
+          EXPECTED_HEAD: ${{ steps.plan.outputs.head }}
+          TAG: ${{ steps.plan.outputs.tag }}
+          RELEASE_MESSAGE: ${{ steps.plan.outputs.commit_message }}
+        run: |
+          remote_head="$(git ls-remote origin refs/heads/production | cut -f1)"
+          if [[ "$GITHUB_REF" != 'refs/heads/production' || "$(git branch --show-current)" != 'production' ]]; then
+            echo 'Publication requires the production branch.' >&2
+            exit 1
           fi
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo 'Publication requires a clean working tree.' >&2
+            exit 1
+          fi
+          if [[ "$(git rev-parse HEAD)" != "$EXPECTED_HEAD" || "$remote_head" != "$EXPECTED_HEAD" ]]; then
+            echo 'production changed while preparing the release; rerun the workflow.' >&2
+            exit 1
+          fi
+          files=(package.json CHANGELOG.md)
+          for file in package-lock.json npm-shrinkwrap.json; do
+            if [[ -f "$RELEASE_DIR/$file" ]]; then
+              files+=("$file")
+            fi
+          done
+          for file in "${files[@]}"; do
+            cp -- "$RELEASE_DIR/$file" "$file"
+          done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "${files[@]}"
+          git commit -m "$RELEASE_MESSAGE"
+          git tag -a "$TAG" -m "$TAG"
+          git push --atomic origin HEAD:refs/heads/production "refs/tags/$TAG"
+
+      - name: Publish GitHub release
+        id: publish
+        if: env.DRY_RUN != 'true' && steps.plan.outputs.release == 'true'
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          gh release create "$TAG" --verify-tag --title "$TAG" \
+            --notes-file "$RELEASE_DIR/notes.md"

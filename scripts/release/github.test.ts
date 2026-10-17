@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import test from "node:test";
-import { createGitHubClient } from "./github.mjs";
+import { test } from "vitest";
+import { createGitHubClient } from "./github.ts";
 
-test("pagination includes later contributors and PRs", async () => {
-  const urls = [];
+test("pagination includes later PRs", async () => {
+  const urls: string[] = [];
   const client = createGitHubClient({
     token: "test-token",
     fetchImpl: async (url) => {

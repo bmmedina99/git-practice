@@ -1,16 +1,32 @@
-import { parseConventionalCommit } from "./core.mjs";
+import { parseConventionalCommit, type Section } from "./core.ts";
 
-function markdownText(value) {
+export interface Commit {
+  sha: string;
+  message: string;
+}
+export interface PullRequest {
+  number: number;
+  merged_at: string | null;
+  merge_commit_sha: string | null;
+  base: { ref: string };
+  user: { login: string };
+}
+
+function markdownText(value: string) {
   return value.replace(/[\\`*_{}[\]<>]/g, "\\$&").replace(/@/g, "&#64;");
 }
 
 // develop receives squash merges, so merge_commit_sha identifies the original
 // PR exactly. The develop -> production promotion PR is deliberately excluded.
-export function originalPullRequests(pulls, reachable) {
-  const result = new Map();
+export function originalPullRequests(
+  pulls: PullRequest[],
+  reachable: Set<string>,
+) {
+  const result = new Map<string, PullRequest>();
   for (const pull of pulls) {
     if (
       !pull.merged_at ||
+      !pull.merge_commit_sha ||
       pull.base.ref !== "develop" ||
       !reachable.has(pull.merge_commit_sha)
     )
@@ -23,47 +39,25 @@ export function originalPullRequests(pulls, reachable) {
   return result;
 }
 
-export function newContributors(commits, history, previousHashes, pullsBySha) {
-  const known = new Set();
-  for (const commit of history) {
-    if (!previousHashes.has(commit.sha)) continue;
-    if (commit.author?.login) known.add(commit.author.login.toLowerCase());
-  }
-  for (const [sha, pull] of pullsBySha) {
-    if (previousHashes.has(sha)) known.add(pull.user.login.toLowerCase());
-  }
-
-  const metadata = new Map(history.map((commit) => [commit.sha, commit]));
-  const newcomers = new Map();
-  for (const commit of commits) {
-    const pull = pullsBySha.get(commit.sha);
-    // Direct pushes intentionally receive no acknowledgement.
-    if (!pull) continue;
-    const users = [pull.user, metadata.get(commit.sha)?.author];
-    for (const user of users) {
-      if (!user?.login || user.type === "Bot" || user.login.endsWith("[bot]"))
-        continue;
-      const key = user.login.toLowerCase();
-      if (!known.has(key) && !newcomers.has(key)) {
-        newcomers.set(key, { login: user.login, number: pull.number });
-      }
-    }
-  }
-  return [...newcomers.values()];
-}
-
 export function renderNotes({
   tag,
   previousTag,
   date,
   commits,
   pullsBySha,
-  newcomers,
   repository,
+}: {
+  tag: string;
+  previousTag: string | null;
+  date: string;
+  commits: Commit[];
+  pullsBySha: Map<string, PullRequest>;
+  repository: string;
 }) {
-  const sections = new Map([
+  const sections = new Map<Section, string[]>([
     ["Breaking Changes", []],
     ["Features", []],
+    ["Performance", []],
     ["Fixes", []],
   ]);
   for (const commit of commits) {
@@ -77,21 +71,12 @@ export function renderNotes({
     const credit = pull
       ? ` (#${pull.number}) (${commit.sha.slice(0, 7)}) - thanks @${pull.user.login}`
       : ` (${commit.sha.slice(0, 7)})`;
-    sections.get(parsed.section).push(`- ${label}${credit}`);
+    sections.get(parsed.section)?.push(`- ${label}${credit}`);
   }
 
   const lines = [`## ${tag} - ${date}`, ""];
   for (const [heading, entries] of sections) {
     if (entries.length) lines.push(`### ${heading}`, "", ...entries, "");
-  }
-  if (newcomers.length) {
-    lines.push("### New Contributors", "");
-    for (const newcomer of newcomers) {
-      lines.push(
-        `- @${newcomer.login} made their first contribution in #${newcomer.number}`,
-      );
-    }
-    lines.push("");
   }
   if (previousTag) {
     lines.push(
@@ -102,12 +87,12 @@ export function renderNotes({
   return lines.join("\n");
 }
 
-export function prependChangelog(existing, notes) {
+export function prependChangelog(existing: string, notes: string) {
   const history = existing.replace(/^# Changelog\s*\n/i, "").trim();
   return `# Changelog\n\n${notes.trim()}\n${history ? `\n${history}\n` : ""}`;
 }
 
-export function extractReleaseNotes(changelog, tag) {
+export function extractReleaseNotes(changelog: string, tag: string) {
   const escaped = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const match = new RegExp(
     `^## ${escaped} - [^\\n]+\\n[\\s\\S]*?(?=^## |$(?![\\s\\S]))`,

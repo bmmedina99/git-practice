@@ -1,18 +1,29 @@
 // Pure release rules: no network requests, Git mutations or npm dependencies.
+export type Bump = "patch" | "minor" | "major";
+export type Section = "Breaking Changes" | "Features" | "Performance" | "Fixes";
+export interface ConventionalCommit {
+  type: string;
+  scope: string | null;
+  description: string;
+  breaking: boolean;
+  section: Section | null;
+  bump: Bump | null;
+}
+
 const STABLE_TAG = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
-export function releaseCommitMessage(tag) {
+export function releaseCommitMessage(tag: string) {
   return `chore(release): :bookmark: ${tag} [skip ci]`;
 }
 
-export function parseStableTag(tag) {
+export function parseStableTag(tag: string) {
   const match = STABLE_TAG.exec(tag);
   return match ? match.slice(1).map(BigInt) : null;
 }
 
 // The caller must supply only tags reachable from the publication branch.
-export function latestStableTag(tags) {
-  let latest = null;
+export function latestStableTag(tags: string[]) {
+  let latest: { tag: string; parts: bigint[] } | null = null;
   for (const tag of tags) {
     const parts = parseStableTag(tag);
     if (!parts) continue;
@@ -29,7 +40,9 @@ export function latestStableTag(tags) {
   return latest?.tag ?? null;
 }
 
-export function parseConventionalCommit(message) {
+export function parseConventionalCommit(
+  message: string,
+): ConventionalCommit | null {
   const [subject] = message.split(/\r?\n/);
   const match =
     /^([a-z][a-z0-9-]*)(?:\(([^()\r\n]+)\))?(!)?:[ \t]+(\S.*)$/i.exec(subject);
@@ -44,9 +57,11 @@ export function parseConventionalCommit(message) {
     ? "Breaking Changes"
     : type === "feat"
       ? "Features"
-      : type === "fix"
-        ? "Fixes"
-        : null;
+      : type === "perf"
+        ? "Performance"
+        : type === "fix"
+          ? "Fixes"
+          : null;
 
   return {
     type,
@@ -56,7 +71,7 @@ export function parseConventionalCommit(message) {
     section,
     bump: breaking
       ? "major"
-      : type === "feat"
+      : type === "feat" || type === "perf"
         ? "minor"
         : type === "fix"
           ? "patch"
@@ -64,18 +79,18 @@ export function parseConventionalCommit(message) {
   };
 }
 
-export function releaseBump(messages) {
+export function releaseBump(messages: string[]) {
   const priority = { patch: 1, minor: 2, major: 3 };
-  let bump = null;
+  let bump: Bump | null = null;
   for (const message of messages) {
     const candidate = parseConventionalCommit(message)?.bump;
-    if (candidate && priority[candidate] > (priority[bump] ?? 0))
+    if (candidate && priority[candidate] > (bump ? priority[bump] : 0))
       bump = candidate;
   }
   return bump;
 }
 
-export function nextVersion(previousTag, bump) {
+export function nextVersion(previousTag: string, bump: Bump) {
   const parts = parseStableTag(previousTag);
   if (!parts)
     throw new Error(`Expected a stable vX.Y.Z tag, received: ${previousTag}`);
